@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Object 14-V — Facility Map</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Share+Tech+Mono&family=Cinzel:wght@400;600&display=swap');
+
+  :root {
+    --blood: #8b0000;
+    --red: #c0392b;
+    --dim-red: #5a1010;
+    --blue: #4a8acc;
+    --dim-blue: #1a2a4a;
+    --gold: #cc9900;
+    --dim-gold: #5a4010;
+    --green: #3a6a28;
+    --dim-green: #0d1a08;
+    --purple: #5a3a8a;
+    --dim-purple: #0d0a18;
+    --bg: #080808;
+    --panel: #0e0e0e;
+    --border: #1e1e1e;
+    --text: #c8c0b0;
+    --muted: #555;
+    --megalith: #5a8acc;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Text', Georgia, serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    text-align: center;
+    padding: 2rem 1rem 1.5rem;
+    border-bottom: 1px solid #1a0505;
+    background: linear-gradient(180deg, #0f0303 0%, #080808 100%);
+    position: relative;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 10%; right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--blood), transparent);
+  }
+  .header-eyebrow {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+  .header-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 600;
+    color: var(--red);
+    letter-spacing: 0.08em;
+    text-shadow: 0 0 40px rgba(139,0,0,0.4);
+  }
+  .header-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    margin-top: 0.4rem;
+  }
+  .header-instruction {
+    font-size: 0.9rem;
+    color: #4a4a4a;
+    margin-top: 0.8rem;
+    font-style: italic;
+  }
+
+  /* ── LAYOUT ── */
+  .map-wrapper {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  /* ── DEPTH RAIL ── */
+  .facility {
+    display: flex;
+    gap: 0;
+    position: relative;
+  }
+  .depth-rail {
+    width: 52px;
+    flex-shrink: 0;
+    position: relative;
+    padding-top: 0;
+  }
+  .depth-marker {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-align: right;
+    padding-right: 8px;
+    position: absolute;
+    right: 0;
+    transform: translateY(-50%);
+    white-space: nowrap;
+  }
+  .depth-line {
+    position: absolute;
+    right: 0;
+    width: 12px;
+    height: 1px;
+    background: #333;
+  }
+  .depth-bar {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, #1a0505, #050510);
+    border-right: 1px solid #222;
+  }
+
+  /* ── SECTIONS ── */
+  .sections {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  /* ── SURFACE ── */
+  .surface-section {
+    background: linear-gradient(180deg, #070f07, #050a05);
+    border: 1px solid #1a2a1a;
+    border-radius: 3px 3px 0 0;
+    padding: 1rem;
+    position: relative;
+    overflow: hidden;
+    min-height: 120px;
+  }
+  .surface-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    color: #2a4a2a;
+    margin-bottom: 0.75rem;
+  }
+  .surface-elements {
+    display: flex;
+    align-items: flex-end;
+    gap: 1.5rem;
+    position: relative;
+  }
+
+  /* ── LEVEL BAND ── */
+  .level-band {
+    border-radius: 2px;
+    overflow: hidden;
+    border: 1px solid;
+  }
+  .level-band.admin   { background: #070d04; border-color: #1a2a0a; }
+  .level-band.research { background: #07040f; border-color: #1a0a2a; }
+  .level-band.engineering { background: #030510; border-color: #0a0f28; }
+  .level-band.tunnel  { background: #030408; border-color: #0a0a1a; }
+  .level-band.chamber { background: #02030c; border-color: #0a0a28; }
+
+  .level-header {
+    padding: 0.4rem 1rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid;
+  }
+  .admin .level-header   { color: #4a7a20; border-color: #1a2a0a; background: #070e04; }
+  .research .level-header { color: #6a3a9a; border-color: #1a0a2a; background: #08030f; }
+  .engineering .level-header { color: #3a5a9a; border-color: #0a0f28; background: #030610; }
+  .tunnel .level-header  { color: #2a2a6a; border-color: #0a0a1a; background: #020308; }
+  .chamber .level-header { color: #3a3a9a; border-color: #0a0a28; background: #020310; }
+
+  .level-depth {
+    font-size: 0.6rem;
+    opacity: 0.6;
+  }
+
+  .rooms-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    padding: 6px;
+  }
+
+  /* ── ROOM CARD ── */
+  .room {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 2px;
+    padding: 0.6rem 0.75rem;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.15s ease;
+    flex: 1;
+    min-width: 140px;
+    max-width: 260px;
+  }
+  .room:hover {
+    border-color: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.05);
+    z-index: 10;
+  }
+  .room.key-item {
+    border-color: rgba(204,153,0,0.3);
+    background: rgba(204,153,0,0.04);
+  }
+  .room.key-item:hover { border-color: rgba(204,153,0,0.6); background: rgba(204,153,0,0.08); }
+  .room.danger {
+    border-color: rgba(139,0,0,0.3);
+    background: rgba(139,0,0,0.04);
+  }
+  .room.danger:hover { border-color: rgba(192,57,43,0.6); background: rgba(139,0,0,0.08); }
+  .room.critical {
+    border-color: rgba(74,138,204,0.4);
+    background: rgba(74,138,204,0.05);
+  }
+  .room.critical:hover { border-color: rgba(74,138,204,0.7); background: rgba(74,138,204,0.1); }
+
+  .room-id {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .room-id .badge {
+    font-size: 0.55rem;
+    padding: 1px 4px;
+    border-radius: 2px;
+    font-weight: bold;
+  }
+  .badge.key { background: rgba(204,153,0,0.2); color: var(--gold); border: 1px solid rgba(204,153,0,0.3); }
+  .badge.danger { background: rgba(139,0,0,0.2); color: var(--red); border: 1px solid rgba(139,0,0,0.3); }
+  .badge.critical { background: rgba(74,138,204,0.15); color: var(--blue); border: 1px solid rgba(74,138,204,0.3); }
+
+  .room-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: #aaa;
+  }
+  .room-icon {
+    font-size: 1.1rem;
+    margin-bottom: 0.2rem;
+    display: block;
+  }
+
+  /* ── ADMIN rooms ── */
+  .admin .room-id { color: #4a7a20; }
+  .admin .room-name { color: #7a9a50; }
+
+  /* ── RESEARCH rooms ── */
+  .research .room-id { color: #6a3a9a; }
+  .research .room-name { color: #8a5aaa; }
+
+  /* ── ENGINEERING rooms ── */
+  .engineering .room-id { color: #3a5a9a; }
+  .engineering .room-name { color: #5a7acc; }
+
+  /* ── TUNNEL ── */
+  .tunnel .room-id { color: #3a3a7a; }
+  .tunnel .room-name { color: #5a5a9a; }
+
+  /* ── CHAMBER ── */
+  .chamber .room-id { color: #4a4aaa; }
+  .chamber .room-name { color: #7a7acc; }
+
+  /* ── TOOLTIP ── */
+  .tooltip {
+    position: fixed;
+    z-index: 1000;
+    max-width: 320px;
+    background: #0c0c0c;
+    border: 1px solid #2a2a2a;
+    border-radius: 3px;
+    padding: 0;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.12s ease, transform 0.12s ease;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.04);
+  }
+  .tooltip.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .tooltip-header {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #1a1a1a;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+  }
+  .tooltip-room-id {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+  }
+  .tooltip-room-name {
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    color: #ddd;
+    flex: 1;
+  }
+  .tooltip-body {
+    padding: 0.6rem 0.75rem;
+  }
+  .tooltip-desc {
+    font-size: 0.85rem;
+    color: #999;
+    line-height: 1.5;
+    margin-bottom: 0.5rem;
+    font-style: italic;
+  }
+  .tooltip-items {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .tooltip-items li {
+    font-size: 0.8rem;
+    color: #888;
+    padding-left: 0.9rem;
+    position: relative;
+    line-height: 1.4;
+  }
+  .tooltip-items li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: #333;
+  }
+  .tooltip-items li.key-find {
+    color: #cc9900;
+  }
+  .tooltip-items li.key-find::before { color: #665500; }
+  .tooltip-items li.danger-find {
+    color: #c0392b;
+  }
+  .tooltip-items li.danger-find::before { color: #5a1010; }
+  .tooltip-items li.note {
+    color: #4a7aaa;
+  }
+  .tooltip-items li.note::before { color: #1a3a5a; }
+  .tooltip-tag {
+    display: inline-block;
+    margin-top: 0.5rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    padding: 2px 6px;
+    border-radius: 2px;
+    letter-spacing: 0.1em;
+  }
+  .tag-key { background: rgba(204,153,0,0.15); color: var(--gold); border: 1px solid rgba(204,153,0,0.2); }
+  .tag-danger { background: rgba(139,0,0,0.15); color: var(--red); border: 1px solid rgba(139,0,0,0.2); }
+  .tag-critical { background: rgba(74,138,204,0.12); color: var(--blue); border: 1px solid rgba(74,138,204,0.2); }
+
+  /* ── SURFACE CLICKABLE ELEMENTS ── */
+  .surface-element {
+    cursor: pointer;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 2px;
+    background: rgba(255,255,255,0.02);
+    transition: all 0.15s;
+    text-align: center;
+    min-width: 100px;
+  }
+  .surface-element:hover {
+    border-color: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05);
+  }
+  .surface-element .room-id { justify-content: center; }
+  .surface-element .room-name { text-align: center; font-size: 0.75rem; }
+
+  /* ── TUNNEL FULL WIDTH ── */
+  .tunnel-room {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.6rem 1rem;
+  }
+  .tunnel-glyphs {
+    display: flex;
+    gap: 8px;
+    opacity: 0.4;
+    flex: 1;
+    overflow: hidden;
+  }
+  .glyph {
+    font-size: 1rem;
+    color: #3a3a7a;
+    white-space: nowrap;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  /* ── CHAMBER SPECIAL ── */
+  .chamber-layout {
+    padding: 1rem;
+    display: flex;
+    gap: 1rem;
+    position: relative;
+  }
+  .chamber-rooms {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 220px;
+    flex-shrink: 0;
+  }
+  .chamber-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    min-height: 220px;
+  }
+  .megalith-container {
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem;
+    border: 1px solid rgba(74,138,204,0.2);
+    border-radius: 4px;
+    background: radial-gradient(ellipse at center, rgba(74,138,204,0.08) 0%, transparent 70%);
+    transition: all 0.2s;
+    width: 100%;
+  }
+  .megalith-container:hover {
+    border-color: rgba(74,138,204,0.5);
+    background: radial-gradient(ellipse at center, rgba(74,138,204,0.15) 0%, transparent 70%);
+  }
+  .megalith-svg {
+    width: 80px;
+    height: 120px;
+    margin-bottom: 0.75rem;
+  }
+  .megalith-pulse {
+    animation: pulse 3s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 0.9; transform: scale(1.05); }
+  }
+  .megalith-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    color: var(--blue);
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 12px rgba(74,138,204,0.5);
+    text-align: center;
+  }
+  .megalith-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    color: #2a4a7a;
+    letter-spacing: 0.1em;
+    margin-top: 0.2rem;
+    text-align: center;
+  }
+
+  /* NPC markers */
+  .npc-markers {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .npc-marker {
+    cursor: pointer;
+    padding: 0.3rem 0.6rem;
+    border-radius: 2px;
+    font-size: 0.7rem;
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 0.08em;
+    transition: all 0.15s;
+  }
+  .npc-marker.voss {
+    background: rgba(139,0,0,0.15);
+    border: 1px solid rgba(139,0,0,0.3);
+    color: var(--red);
+  }
+  .npc-marker.voss:hover { background: rgba(139,0,0,0.25); border-color: rgba(192,57,43,0.6); }
+  .npc-marker.nadia {
+    background: rgba(139,0,0,0.08);
+    border: 1px solid rgba(139,0,0,0.2);
+    color: #c0392b;
+  }
+  .npc-marker.nadia:hover { background: rgba(139,0,0,0.15); border-color: rgba(139,0,0,0.4); }
+
+  /* ── FOOTER ── */
+  .map-footer {
+    border-top: 1px solid #111;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    color: #2a2a2a;
+    letter-spacing: 0.1em;
+    margin-top: 3px;
+  }
+  .legend {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #333;
+  }
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 1px;
+    flex-shrink: 0;
+  }
+
+  /* ── SCROLL hint ── */
+  .scroll-hint {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    color: #2a2a2a;
+    letter-spacing: 0.1em;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-eyebrow">PROJEKT NASHEPTYVAL  ·  CLASSIFIED  ·  SEALED NOV 1969</div>
+  <div class="header-title">OBJECT 14-V</div>
+  <div class="header-sub">FACILITY CROSS-SECTION  ·  FOR GM USE ONLY</div>
+  <div class="header-instruction">Hover over any area for GM notes and key items</div>
+</div>
+
+<div class="map-wrapper">
+  <div class="facility">
+
+    <!-- Depth rail -->
+    <div class="depth-rail" id="depthRail">
+      <div class="depth-bar"></div>
+    </div>
+
+    <div class="sections">
+
+      <!-- ══ SURFACE ══ -->
+      <div class="surface-section">
+        <div class="surface-label">SURFACE  /  SIBERIAN TAIGA  /  APPROX. −32°C  /  NIGHT</div>
+        <div class="surface-elements" id="surfaceElements">
+          <div class="surface-element room" data-id="SURFACE" data-name="Displacement Point"
+               data-desc="Where the players appear. A small warm patch in the snow — their ambient body heat transferred with them."
+               data-items='["Circular area of compressed, slightly warm snow","Faint scorch-like discoloration in the snow","Voss tracks leading northeast","Players have only bedside items — no weapons, no gear","Warm patch lasts ~20 minutes of play before fading"]'
+               data-note="Call for cold resistance checks as soon as the patch fades. This is the clock that drives Act One."
+               data-type="normal">
+            <span class="room-icon">❄</span>
+            <div class="room-id">SURFACE-ORIGIN</div>
+            <div class="room-name">Displacement Point</div>
+          </div>
+
+          <div class="surface-element room" data-id="SURFACE" data-name="Observation Tower"
+               data-desc="A squat Soviet-era tower, lights long dead. Offers elevation and line of sight to the dam and forest track."
+               data-items='["Partial shelter from wind","Broken lock on door — can be forced","View of homestead lights through trees (400m NE)","View of dam structure"]'
+               data-note="Players who climb the tower can spot both the homestead lights and the dam simultaneously — useful for navigation without being obvious."
+               data-type="normal">
+            <span class="room-icon">🗼</span>
+            <div class="room-id">SURFACE-OBS</div>
+            <div class="room-name">Observation Tower</div>
+          </div>
+
+          <div class="surface-element room danger" data-id="SURFACE" data-name="The Dam"
+               data-desc="Brutalist concrete, ice-sheeted face. The broken door on the walkway — warped outward — is the primary entrance to Object 14-V."
+               data-items='["Broken door (forced from within) — recently","Blood circle with Yithian symbols on walkway","Corroded ladder on eastern face — one rung unsafe","Footprints: one heavy/purposeful, one lighter/irregular","The hum is first audible here"]'
+               data-note="The blood symbol is Voss's. He drew it instinctively without understanding why. Gennady has seen similar shapes in the bedrock near here. The two unsafe ladder rungs can cause a fall — call for a check on any character moving carelessly."
+               data-type="danger">
+            <span class="room-icon">🏗</span>
+            <div class="room-id">SURFACE-DAM</div>
+            <div class="room-name">The Dam</div>
+          </div>
+
+          <div class="surface-element room" data-id="SURFACE" data-name="Forest Track (NE)"
+               data-desc="The path Voss took toward the homestead and then the facility. Snow-packed, passable, dark."
+               data-items='["Voss track: heavy, purposeful, heading NE","Birch tree with stripped bark — symbols in ash halfway along","Subsonic hum felt in back teeth before heard","Single crow — watches, follows, does not flee"]'
+               data-note="The birch symbols are Yithian navigational glyphs. Photographing or sketching them and showing Gennady confirms the connection to the bedrock carvings. The crow is atmosphere only — do not make it supernatural unless you want to."
+               data-type="normal">
+            <span class="room-icon">🌲</span>
+            <div class="room-id">SURFACE-TRACK</div>
+            <div class="room-name">Forest Track (NE)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ LEVEL 1 — ADMIN ══ -->
+      <div class="level-band admin">
+        <div class="level-header">
+          <span>LEVEL 1  —  ADMINISTRATIVE</span>
+          <span class="level-depth">DEPTH: 10m</span>
+        </div>
+        <div class="rooms-grid">
+
+          <div class="room" data-id="L1-A" data-name="Entry / Decontamination"
+               data-desc="First chamber at the base of the staircase. Empty lockers, degraded hazmat suits still hanging in alcoves."
+               data-items='["Lockers (all empty — cleared in 1969)","Decayed decon suits (not wearable)","Pressure door — sealed but unlocked","Emergency lighting activates on motion (red, dim)"]'
+               data-note="The decon suits crumble at a touch. The pressure door requires a firm shove — it has warped slightly in the cold but opens. First thing players notice: the smell changes. Frost above, something older below."
+               data-type="normal">
+            <div class="room-id">L1-A</div>
+            <div class="room-name">Entry / Decon</div>
+          </div>
+
+          <div class="room" data-id="L1-B" data-name="Main Corridor"
+               data-desc="Primary passage connecting all Level 1 rooms. Six doors. Emergency lighting still functional."
+               data-items='["Soviet propaganda poster — perfectly preserved in dry cold","Emergency lighting (red, flickering)","Six doors along corridor","Frost crystals on every surface"]'
+               data-note="The propaganda poster is weirdly immaculate — the dry cold has preserved it as if 1969 was last week. Small detail but players often remark on it. Let it land."
+               data-type="normal">
+            <div class="room-id">L1-B</div>
+            <div class="room-name">Main Corridor</div>
+          </div>
+
+          <div class="room" data-id="L1-C" data-name="Director's Office"
+               data-desc="Heavy desk, three framed photographs of Moscow, a locked floor safe. Signs of an organized departure."
+               data-items='["Locked floor safe (combination unknown — personal effects inside, not documents)","Three framed Moscow photos","Desk clear — documents removed before departure","Personal letters in desk drawer (in Russian)"]'
+               data-note="The safe combination is not findable in the facility. It contains a wedding ring, a photograph of a woman and child, and a handwritten note in Russian that says only: 'Do not open the gate.' Players who crack it by force find only this. No mechanic reward — pure atmosphere."
+               data-type="normal">
+            <div class="room-id">L1-C</div>
+            <div class="room-name">Director's Office</div>
+          </div>
+
+          <div class="room" data-id="L1-D" data-name="Communications Room"
+               data-desc="Aged radio equipment, partially functional. A short-range signal can be transmitted with effort and a successful check."
+               data-items='["Short-wave radio (partial function)","Can transmit short-range signal if repaired","Cannot receive — receiver array is dead","Transmission may be intercepted by Detachment Rybak"]'
+               data-note="If players manage to transmit, Korolev's unit picks it up. This can be used to negotiate, to mislead, or simply to accelerate the military's arrival.Korolev will respond in Russian — another moment where language barriers matter."
+               data-type="normal">
+            <div class="room-id">L1-D</div>
+            <div class="room-name">Communications Room</div>
+          </div>
+
+          <div class="room" data-id="L1-E" data-name="Break Room"
+               data-desc="Frozen food on the table. Two mugs. A chessboard with a game in progress, abandoned mid-move."
+               data-items='["Two plates — one half-eaten, one untouched","Frozen food (inedible but suggestive)","Chess game mid-play — white has a decisive advantage","Mugs — one still has frozen liquid inside"]'
+               data-note="The chess game is a quiet horror detail. Someone had the upper hand and never finished. The half-eaten plate suggests the departure was sudden for at least one person. Let players draw their own conclusions."
+               data-type="normal">
+            <div class="room-id">L1-E</div>
+            <div class="room-name">Break Room</div>
+          </div>
+
+          <div class="room key-item" data-id="L1-F" data-name="Document Archive"
+               data-desc="Filing cabinets, shelves of binders. Most documents are routine — but two items here are essential."
+               data-items='["★ PROTOKOL 7 FOLDER — Nasheptyval final project log. Last entry (Nov 3 1969): Dr. Oborina writes that Kastl says resonance exceeding models is success. Dyrenkov has not spoken in four days. They activate tomorrow.","★ CHAMBER SCHEMATIC — hand-drawn diagram showing megalith and electromagnet array. Labels all control functions. ESSENTIAL for Option B.","Technical research logs (dense, partially useful)","Personnel files — names of the 14 who vanished"]'
+               data-note="The schematic is the single most important physical find in the facility. Without it, the Level 3 controls are nearly impossible to operate correctly. With it, Option B is achievable. Make it findable but not obvious — it's folded inside the Protokol 7 folder."
+               data-type="key">
+            <div class="room-id">L1-F <span class="badge key">★ KEY</span></div>
+            <div class="room-name">Document Archive</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══ LEVEL 2 — RESEARCH ══ -->
+      <div class="level-band research">
+        <div class="level-header">
+          <span>LEVEL 2  —  RESEARCH</span>
+          <span class="level-depth">DEPTH: 22m</span>
+        </div>
+        <div class="rooms-grid">
+
+          <div class="room danger" data-id="L2-A" data-name="Research Laboratory"
+               data-desc="Main experimental space. Specimen cages — large ones, built for people. Two of them have dark staining on the floor."
+               data-items='["Human-sized specimen cages (5 total — all empty)","Dark staining on floor of two cages (old blood)","Restraint hardware still bolted to cage frames","Observation window on far wall — room beyond collapsed"]'
+               data-note="This is a gut-punch room. Don't rush the description. The cages are sized for adults. The staining is not recent — decades old — but the restraints are still clean and functional. Let that land. If anyone checks: the staining is human blood. The cages were used."
+               data-type="danger">
+            <div class="room-id">L2-A <span class="badge danger">◆</span></div>
+            <div class="room-name">Research Laboratory</div>
+          </div>
+
+          <div class="room danger" data-id="L2-B" data-name="Chemical Storage"
+               data-desc="Shelved barrels and containers, most degraded. Some intact containers hold substances that are dangerously unstable after 50 years."
+               data-items='["Most compounds: degraded to harmless residue","3–4 intact containers: contents under pressure, unstable","Psychoactive compound stores (Nasheptyval protocol ingredient)","Flammable material — fire hazard in this room"]'
+               data-note="The intact containers can be used as improvised weapons or distractions — they will rupture violently if struck or heated. The psychoactive stores are the compounds used to 'tune' human subjects to the megalith's frequency. This is not in any label but can be deduced from the Protokol 7 documents."
+               data-type="danger">
+            <div class="room-id">L2-B <span class="badge danger">⚠</span></div>
+            <div class="room-name">Chemical Storage</div>
+          </div>
+
+          <div class="room" data-id="L2-C" data-name="Technical Library"
+               data-desc="Bookshelves of classified research documents. Dense and technical, but a section on spatial correspondence theory is here."
+               data-items='["Spatial correspondence theory section (explains how megalith identifies geometric matches between distant locations)","Confirms: the device does not create portals — it finds natural correspondences and enacts them","References to pre-human structure predating Soviet involvement","Kastl\'s personal research notes (partial, in German)"]'
+               data-note="This room rewards players who invest time here. The key revelation: the players' original location and the facility share a geometric correspondence that the megalith recognized. This is why they specifically were taken. This should feel personal and unsettling."
+               data-type="normal">
+            <div class="room-id">L2-C</div>
+            <div class="room-name">Technical Library</div>
+          </div>
+
+          <div class="room key-item" data-id="L2-D" data-name="Emergency Munitions Store"
+               data-desc="Two crates of Soviet-era demolition charges, 1969 vintage. Dusty but real."
+               data-items='["★ CRATE 1 — reliable. Standard Soviet demolition charges. Functional.","⚠ CRATE 2 — requires reliability check. 50-year-old detonators are unpredictable.","Detonator wire (brittle, handle carefully)","Blast radius: sufficient to destroy the megalith chamber"]'
+               data-note="Option A resource. One crate is solid, one is a gamble. If players use both without checking the second crate, the detonator may fail at the worst moment — or go off early. Keep the tension up. Make them choose how careful to be given the time pressure."
+               data-type="key">
+            <div class="room-id">L2-D <span class="badge key">★ KEY</span></div>
+            <div class="room-name">Emergency Munitions</div>
+          </div>
+
+          <div class="room" data-id="L2-E" data-name="Infirmary"
+               data-desc="Small medical room with a bed, surgical equipment, and supply cabinets. Some supplies are still usable."
+               data-items='["Usable: bandages, basic suture kit, antiseptic (frozen but functional)","Usable: morphine (2 doses — still sealed)","Cold treatment: wool blankets (dry, intact)","Surgical tools — sterile in cold conditions"]'
+               data-note="This is a genuine resource room. The morphine and blankets are meaningful in a survival horror scenario. If any player is badly cold-exposed or injured by Voss, this room is the difference between functional and non-functional. Make sure players can find it."
+               data-type="normal">
+            <div class="room-id">L2-E</div>
+            <div class="room-name">Infirmary</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══ LEVEL 3 — ENGINEERING ══ -->
+      <div class="level-band engineering">
+        <div class="level-header">
+          <span>LEVEL 3  —  ENGINEERING</span>
+          <span class="level-depth">DEPTH: 33m</span>
+        </div>
+        <div class="rooms-grid">
+
+          <div class="room" data-id="L3-A" data-name="Engineering Corridor"
+               data-desc="The vibration is physical here. Every metal surface hums under the hand. The air smells mineral and ancient."
+               data-items='["Vibration felt through boots and handrails","Subsonic hum becomes a physical sensation","Pipes along ceiling — all connected to electromagnet array","Faint blue-grey light bleeding under the door to L3-B"]'
+               data-note="Describe the vibration physically — not just heard but felt in the sternum, in the sinuses, in the fillings of back teeth. This is where the reality of the megalith becomes undeniable. No psychology check needed — it's just real."
+               data-type="normal">
+            <div class="room-id">L3-A</div>
+            <div class="room-name">Engineering Corridor</div>
+          </div>
+
+          <div class="room critical" data-id="L3-B" data-name="Electromagnet Array Control Room"
+               data-desc="The critical room for Option B. Banks of Soviet-era equipment, gauges active, dials set by hands that vanished in 1969."
+               data-items='["★★ OBRATNO SWITCH — large red switch labeled ОБРАТНО (Back). Initiates reversal sequence.","★ THREE CONTROL DIALS — must be set to precise positions per schematic (L1-F). Setting without schematic requires expert technical knowledge.","⚠ HAND-WRITTEN WARNING NOTE — taped to equipment: DO NOT ENGAGE SECONDARY COIL BEFORE PRIMARY STABILIZATION","Active gauges — still reading, geothermal power","90-second countdown from OBRATNO activation"]'
+               data-note="The sequence: (1) Stabilize primary coil via Dial A, (2) Set Dials B and C per schematic, (3) Engage OBRATNO. If secondary coil engaged before primary stabilization: field accelerates instead of reverses — immediate random displacement. Two failed consecutive rolls on the same dial triggers this. The 90-second window after OBRATNO is the final act climax window."
+               data-type="critical">
+            <div class="room-id">L3-B <span class="badge critical">★★ CRITICAL</span></div>
+            <div class="room-name">Control Room / OBRATNO</div>
+          </div>
+
+          <div class="room" data-id="L3-C" data-name="Geothermal Tap Access"
+               data-desc="The facility's power source. A geothermal tap drawing heat from deep bedrock, converted to electrical current."
+               data-items='["Powers the entire facility — electromagnets, lighting, emergency systems","Can be cut: kills all power including emergency lighting (total darkness)","Can be manipulated: overloading the tap surges the electromagnet array — unpredictable results","Cutting power does NOT stop the megalith — it is not powered, it resonates"]'
+               data-note="Cutting power is a dramatic option but not a solution. The megalith doesn't need the electromagnets to resonate — it just won't be amplified without them. This could reduce the displacement field's range without closing the Gate. Use this if players need an intermediate option."
+               data-type="normal">
+            <div class="room-id">L3-C</div>
+            <div class="room-name">Geothermal Tap</div>
+          </div>
+
+          <div class="room key-item" data-id="L3-D" data-name="Mechanical Room"
+               data-desc="Heavy industrial tools, pipe sections, maintenance equipment. The pipe wrench here is the Option A alternative to explosives."
+               data-items='["★ PIPE WRENCH (large, heavy) — can be used to smash the primary electromagnetic coils","Smashing coils: destabilizes amplification field — megalith shatters under its own resonance within ~8 minutes","8-minute window after coil damage: get OUT","Standard heavy tools: crowbars, bolt cutters, etc."]'
+               data-note="Nadia mentions this wrench if freed before the players reach L3. It's the low-tech Option A — no explosives required, but it creates an 8-minute countdown that is harder to control than the charges. The coils are in L3-E/F and must be physically smashed, which means time in the most active part of the facility during its death spiral."
+               data-type="key">
+            <div class="room-id">L3-D <span class="badge key">★ KEY</span></div>
+            <div class="room-name">Mechanical Room</div>
+          </div>
+
+          <div class="room" data-id="L3-E" data-name="Primary Coil Array"
+               data-desc="The primary electromagnetic coil housing. Two massive coils, connected to the megalith below."
+               data-items='["Primary coils — must be stabilized before secondary engagement (see L3-B warning)","Smashing these: initiates 8-minute countdown to megalith shatter (Option A wrench route)","Coil housings warm to the touch despite facility temperature","Faint blue light pulses through coil cores in sync with megalith"]'
+               data-note="The warm-to-the-touch detail is important — it tells players the system is genuinely active, not just running on residual power. The pulse sync between coils and megalith is eerie if described well: the facility breathes."
+               data-type="normal">
+            <div class="room-id">L3-E</div>
+            <div class="room-name">Primary Coil Array</div>
+          </div>
+
+          <div class="room danger" data-id="L3-F" data-name="Secondary Coil Array"
+               data-desc="Secondary electromagnetic coils. WARNING: engaging these before primary stabilization accelerates the field."
+               data-items='["⚠ ENGAGE LAST — per warning note in L3-B","If engaged first: field accelerates, immediate random displacement event","Smashing these AFTER primary coils: speeds up the 8-minute countdown","Label reads: ВТОРИЧНЫЙ КОНТУР (Secondary Loop)"]'
+               data-note="This room is a trap for impatient players. If they're rushing and engage the secondary coil first, the displacement field goes active immediately — uncontrolled. Run that as a full random displacement event: everyone is shunted somewhere. Could be the surface. Could be somewhere else. Make it feel like a real consequence."
+               data-type="danger">
+            <div class="room-id">L3-F <span class="badge danger">⚠</span></div>
+            <div class="room-name">Secondary Coil Array</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══ ACCESS TUNNEL ══ -->
+      <div class="level-band tunnel">
+        <div class="level-header">
+          <span>ACCESS TUNNEL  —  NARROWS TO SINGLE FILE</span>
+          <span class="level-depth">DEPTH: 38m</span>
+        </div>
+        <div class="rooms-grid">
+          <div class="room tunnel-room" data-id="TUNNEL" data-name="Access Tunnel"
+               data-desc="The passage narrows to single file. Pre-human carvings cover every surface — Yithian navigational glyphs, deeply worn, predating all known human civilization in the region."
+               data-items='["Single-file passage — no rushing, no combat in here","Yithian navigational glyphs carved into walls (match the symbols from the forest birch tree)","Carvings predate Soviet construction — the facility was built around this tunnel","Temperature drops another 5°C in this section","A woman\'s voice audible from below — fast and low, controlled"]'
+               data-note="The carvings are the moment the full age of the thing becomes real. The Soviets didn't make this access — they found it and built around it. Let players spend a moment with this if they want to. The voice below is Nadia, talking fast and low to keep herself calm. It gives the players a direction and a reason to move."
+               data-type="normal">
+            <div class="room-id">TUNNEL-ACCESS</div>
+            <div class="room-name">Access Tunnel — Pre-Human Carvings</div>
+            <div class="tunnel-glyphs">
+              <span class="glyph">◈</span><span class="glyph">⬡</span><span class="glyph">◇</span><span class="glyph">⊕</span><span class="glyph">◈</span><span class="glyph">⬟</span><span class="glyph">◇</span><span class="glyph">⊗</span><span class="glyph">◈</span><span class="glyph">⬡</span><span class="glyph">◆</span><span class="glyph">⊕</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ LEVEL 4 — THE CHAMBER ══ -->
+      <div class="level-band chamber">
+        <div class="level-header">
+          <span>LEVEL 4  —  THE CHAMBER</span>
+          <span class="level-depth">DEPTH: 40m+  ·  GEOMETRY IS WRONG HERE</span>
+        </div>
+        <div class="chamber-layout">
+          <div class="chamber-rooms">
+
+            <div class="room" data-id="L4-A" data-name="Chamber Entry Approach"
+                 data-desc="The tunnel opens into the chamber. The ceiling is lost in darkness above. The walls curve inward in a way that is not quite right — as if the room is the inside of something organic."
+                 data-items='["Ceiling: undefined — darkness above regardless of light source","Wall geometry: subtly wrong, curves should not curve this way","Distances feel shorter than they are (combat range misjudgment)","Temperature: dropping further than the rest of the facility","Faint blue-grey light from the megalith — sourceless, directional"]'
+                 data-note="Start misrepresenting distances from the moment they enter. If a player says 'I move toward Voss' — ask them how far they think he is. Let them be wrong. The chamber's geometry is the final mechanical horror: they can't fully trust their perception here."
+                 data-type="normal">
+              <div class="room-id">L4-A</div>
+              <div class="room-name">Chamber Entry</div>
+            </div>
+
+            <div class="room danger" data-id="L4-NPC-VOSS" data-name="VOSS — Position"
+                 data-desc="Arkady Voss stands between the players and the megalith. He has a knife. He has been drawing symbols on the floor. He is calculating."
+                 data-items='["Position: between players and megalith","Armed: ritual knife (not standard issue — taken from the Congo ritual site)","State: fractured, desperate, controlled","Ritual drawings in blood/ash on chamber floor","Will use Nadia as leverage if cornered","Partial Yithian knowledge (absorbed, not understood)"]'
+                 data-note="Voss is not angry. His expression is the expression of a man interrupted at something important. He's assessing whether he has time to finish. Open with that beat — let the players read him before he acts. He will talk. He believes talking will resolve this in his favor."
+                 data-type="danger">
+              <div class="room-id">L4-NPC <span class="badge danger">◆ NPC</span></div>
+              <div class="room-name">VOSS — Position</div>
+            </div>
+
+            <div class="room danger" data-id="L4-NPC-NADIA" data-name="NADIA — Position"
+                 data-desc="Nadia Zubov, bound against the far wall. Alive. Functional. Has been listening to Voss for hours and knows more than her captive status suggests."
+                 data-items='["Position: bound, far wall, line of sight to players","State: beyond fear, focused and functional","Intelligence: has heard everything Voss said — knows what he wants","Told players about pipe wrench in L3-D (if freed first)","Not helpless — will act the moment she has her hands free","Asks what you need, then provides it"]'
+                 data-note="Nadia's expression when players enter is not fear — it's relief converted immediately into assessment. She looks at the players, looks at Voss, and makes a calculation. Play her as competent under pressure. She is a resource, not a victim. She has been planning since she was tied up."
+                 data-type="danger">
+              <div class="room-id">L4-NPC <span class="badge danger">◆ NPC</span></div>
+              <div class="room-name">NADIA — Position</div>
+            </div>
+
+          </div>
+
+          <!-- Megalith center -->
+          <div class="chamber-center">
+            <div class="megalith-container room" data-id="L4-B" data-name="The Megalith"
+                 data-desc="It is not quartz. It is not any stone you recognize. Roughly the size of a car standing on end. Cold blue-grey luminescence that pulses in time with the hum — in time with something that might be your own heartbeat if your heartbeat had been wrong all along."
+                 data-items='["Unknown stone — no geological classification","Cold blue-grey luminescence: pulsing, not constant","Pulse frequency matches the facility hum","Pulse frequency matches heartbeat — individual, slightly different for each player","Contact causes immediate disorientation (perceptual only)","Impossible geometric shards drift in air at proximity","Pre-human — the facility was built around it","Cannot be turned off — only destroyed or its field reversed","Warm to touch despite extreme cold"]'
+                 data-note="The heartbeat detail is the centerpiece horror. Describe it as something players notice independently — then confirm they're all experiencing it. Each player's pulse is slightly different. The megalith is matching them. It recognized them when they were asleep. It brought them here. This should feel like a violation."
+                 data-type="critical">
+              <svg class="megalith-svg" viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <radialGradient id="mg" cx="50%" cy="40%" r="60%">
+                    <stop offset="0%" stop-color="#7ab3d4" stop-opacity="0.9"/>
+                    <stop offset="60%" stop-color="#4a8acc" stop-opacity="0.6"/>
+                    <stop offset="100%" stop-color="#1a3a6a" stop-opacity="0.3"/>
+                  </radialGradient>
+                </defs>
+                <!-- Outer glow -->
+                <ellipse cx="40" cy="105" rx="35" ry="8" fill="#4a8acc" opacity="0.1" class="megalith-pulse"/>
+                <ellipse cx="40" cy="105" rx="25" ry="5" fill="#4a8acc" opacity="0.15" class="megalith-pulse"/>
+                <!-- Body -->
+                <polygon points="40,5 18,22 12,85 16,105 40,112 64,105 68,85 62,22" fill="url(#mg)" stroke="#7ab3d4" stroke-width="1.5"/>
+                <!-- Facets -->
+                <polygon points="40,5 18,22 40,32" fill="#3a5a8a" opacity="0.5"/>
+                <polygon points="40,5 62,22 40,32" fill="#5a7aaa" opacity="0.5"/>
+                <line x1="40" y1="5" x2="40" y2="112" stroke="#9ad4f4" stroke-width="0.8" opacity="0.3"/>
+                <line x1="18" y1="22" x2="64" y2="105" stroke="#6a9acc" stroke-width="0.5" opacity="0.2"/>
+                <line x1="62" y1="22" x2="16" y2="105" stroke="#6a9acc" stroke-width="0.5" opacity="0.2"/>
+                <!-- Glow core -->
+                <ellipse cx="40" cy="58" rx="8" ry="15" fill="#7ab3d4" opacity="0.15" class="megalith-pulse"/>
+              </svg>
+              <div class="megalith-label">THE MEGALITH</div>
+              <div class="megalith-sub">UNKNOWN ORIGIN  ·  PRE-HUMAN  ·  STILL RESONATING</div>
+
+              <div class="npc-markers">
+                <div class="npc-marker voss"
+                     data-id="NPC-VOSS" data-name="Arkady Voss"
+                     data-desc="Cult operative. Displaced from the Congo. Mind fractured by the interruption of his ritual. He is not insane — he is wrong, and he cannot be reached by evidence."
+                     data-items='["Combat: highly capable in close quarters, defensive positioning","Tactic: uses megalith at his back, keeps Nadia in reach","Will incapacitate rather than kill — he needs an audience to be afraid","At 30% capacity: abandons combat, makes final ritual attempt","Weakness: his symbols are Yithian glyphs he absorbed without understanding — confront him with this","The ritual will NOT work — but he cannot process that information"]'
+                     data-note="Voss's fracture is specific: he keeps touching his left temple. Brief pauses mid-sentence. Moments where he seems to be listening to something no one else can hear. The ritual he's trying to complete is half-remembered from a Yithian host body. He doesn't have the complete version. A character who recognizes this and says so out loud may cause a real psychological break."
+                     data-type="danger">
+                  ◆ VOSS
+                </div>
+                <div class="npc-marker nadia"
+                     data-id="NPC-NADIA" data-name="Nadia Zubov"
+                     data-desc="34. Environmental science background. Ran the homestead alone for years. Captured by Voss while checking the goats. Has been planning her escape for hours."
+                     data-items='["Knows: Voss wants to open the Gate — needs a death near the megalith","Knows: there\'s heavy equipment downstairs — mentioned the pipe wrench","Knows: facility entrance is through the dam — saw the broken door","Will fight the moment her hands are free","Speaks only Russian — communication barrier","After rescue: immediately practical, not emotional"]'
+                     data-note="Nadia stays in Siberia after Option B. She returns to the homestead. She and Gennady will stay quiet — for now. But she experienced everything. She knows the facility is real, the Gate is real, and the players were real. She is a future hook, a future complication, or a future ally depending on your campaign."
+                     data-type="danger">
+                  ◆ NADIA
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="map-footer">
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#cc9900;opacity:0.5"></div>KEY ITEM</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#c0392b;opacity:0.5"></div>POINT OF INTEREST / NPC</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#4a8acc;opacity:0.5"></div>CRITICAL ROOM</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#555;opacity:0.5"></div>STANDARD ROOM</div>
+        </div>
+        <div>OBJECT 14-V  ·  PROJEKT NASHEPTYVAL  ·  SEALED NOV 1969  ·  GM USE ONLY</div>
+      </div>
+
+    </div><!-- /sections -->
+  </div><!-- /facility -->
+</div><!-- /map-wrapper -->
+
+<!-- ── TOOLTIP ── -->
+<div class="tooltip" id="tooltip">
+  <div class="tooltip-header">
+    <div>
+      <div class="tooltip-room-id" id="tt-id"></div>
+      <div class="tooltip-room-name" id="tt-name"></div>
+    </div>
+    <div id="tt-tag"></div>
+  </div>
+  <div class="tooltip-body">
+    <div class="tooltip-desc" id="tt-desc"></div>
+    <ul class="tooltip-items" id="tt-items"></ul>
+  </div>
+</div>
+
+<div class="scroll-hint">SCROLL TO DESCEND</div>
+
+<script>
+  const tooltip = document.getElementById('tooltip');
+  const ttId = document.getElementById('tt-id');
+  const ttName = document.getElementById('tt-name');
+  const ttDesc = document.getElementById('tt-desc');
+  const ttItems = document.getElementById('tt-items');
+  const ttTag = document.getElementById('tt-tag');
+
+  let mouseX = 0, mouseY = 0;
+  let tooltipVisible = false;
+
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    if (tooltipVisible) positionTooltip();
+  });
+
+  function positionTooltip() {
+    const tw = tooltip.offsetWidth || 320;
+    const th = tooltip.offsetHeight || 200;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const pad = 16;
+
+    let x = mouseX + 18;
+    let y = mouseY + 12;
+
+    if (x + tw > vw - pad) x = mouseX - tw - 14;
+    if (y + th > vh - pad) y = mouseY - th - 10;
+    if (x < pad) x = pad;
+    if (y < pad) y = pad;
+
+    tooltip.style.left = x + 'px';
+    tooltip.style.top = y + 'px';
+  }
+
+  function showTooltip(el) {
+    const id = el.dataset.id;
+    const name = el.dataset.name;
+    const desc = el.dataset.desc;
+    const type = el.dataset.type || 'normal';
+    const note = el.dataset.note;
+    let items = [];
+    try { items = JSON.parse(el.dataset.items || '[]'); } catch(e) {}
+
+    ttId.textContent = id || '';
+    ttName.textContent = name || '';
+    ttDesc.textContent = desc || '';
+
+    // Tag
+    ttTag.innerHTML = '';
+    if (type === 'key') ttTag.innerHTML = '<span class="tooltip-tag tag-key">★ KEY ITEM</span>';
+    else if (type === 'danger') ttTag.innerHTML = '<span class="tooltip-tag tag-danger">◆ NOTABLE</span>';
+    else if (type === 'critical') ttTag.innerHTML = '<span class="tooltip-tag tag-critical">★★ CRITICAL</span>';
+
+    // Items
+    ttItems.innerHTML = '';
+    items.forEach(item => {
+      const li = document.createElement('li');
+      const trimmed = item.trim();
+      if (trimmed.startsWith('★')) { li.classList.add('key-find'); }
+      else if (trimmed.startsWith('⚠') || trimmed.startsWith('◆')) { li.classList.add('danger-find'); }
+      li.textContent = trimmed;
+      ttItems.appendChild(li);
+    });
+
+    // GM note
+    if (note) {
+      const li = document.createElement('li');
+      li.classList.add('note');
+      li.textContent = '[ GM ] ' + note;
+      ttItems.appendChild(li);
+    }
+
+    positionTooltip();
+    tooltip.classList.add('visible');
+    tooltipVisible = true;
+  }
+
+  function hideTooltip() {
+    tooltip.classList.remove('visible');
+    tooltipVisible = false;
+  }
+
+  // Attach to all rooms and interactive elements
+  document.querySelectorAll('.room, .npc-marker, .megalith-container').forEach(el => {
+    if (!el.dataset.id) return;
+    el.addEventListener('mouseenter', () => showTooltip(el));
+    el.addEventListener('mouseleave', hideTooltip);
+    el.addEventListener('click', () => showTooltip(el)); // touch fallback
+  });
+
+  // Build depth markers dynamically
+  const rail = document.getElementById('depthRail');
+  const sections = document.querySelector('.sections');
+  function updateDepthRail() {
+    // Clear old markers
+    rail.querySelectorAll('.depth-marker, .depth-line').forEach(e => e.remove());
+    const depths = [
+      { label: 'SURFACE', selector: '.surface-section' },
+      { label: '10m', selector: '.level-band.admin' },
+      { label: '22m', selector: '.level-band.research' },
+      { label: '33m', selector: '.level-band.engineering' },
+      { label: '38m', selector: '.level-band.tunnel' },
+      { label: '40m+', selector: '.level-band.chamber' },
+    ];
+    depths.forEach(({ label, selector }) => {
+      const el = document.querySelector(selector);
+      if (!el) return;
+      const sectRect = sections.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      const relTop = elRect.top - sectRect.top;
+      const marker = document.createElement('div');
+      marker.className = 'depth-marker';
+      marker.textContent = label;
+      marker.style.top = relTop + 'px';
+      rail.appendChild(marker);
+    });
+  }
+  window.addEventListener('load', updateDepthRail);
+  window.addEventListener('resize', updateDepthRail);
+</script>
+</body>
+</html>
